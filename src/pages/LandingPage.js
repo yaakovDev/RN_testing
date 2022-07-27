@@ -1,54 +1,139 @@
 import React,{useState,useRef,useEffect, useLayoutEffect} from 'react';
+import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
+import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 
 import {
-  Button,
+  Button,Switch,Alert,Modal,
   StyleSheet,
   Text,
   View,SafeAreaView ,
-  ScrollView,SectionList,FlatList, TextInput
+  ScrollView,SectionList,FlatList, TextInput, LogBox,
 } from 'react-native';
 
+const Section = ({caption,text,children}) => { 
+  return (
+  <View style={{...styles.inputContainer,marginTop:25}}>
+  <Text style={styles.textCaption}>{caption}:</Text>      
+  {children}
+  <Text style={{fontSize:30,marginRight:20,marginTop:10,color:'black'}}>{text}</Text>
+  </View>)
+ }
+
+ const DatePicker = () => { 
+    return (<Modal transparent>
+        <View style={{...styles.mainContainer,flexDirection:'row'}}>
+          <View style={styles.datePicker}>
+            <Text>My Modal</Text>
+          </View>
+        </View>
+    </Modal>)
+  }
 
 export const LandingPage = () => {
-  const [name, onChangeName] = useState("john doe");
-  const textRef = useRef()
+  const [dateModalVisible,setDateModalVisible] = useState(false)
+  const [prevSeeing, onChangePrevSeeing] = useState("")
+  const [seeing, onChangeSeeing] = useState("")
+  const [switchVal,toggleSwitch] = useState(false)
+  const seeingRef = useRef()
+
+  const showDateModal = (event) => {  
+    // console.dir(event.nativeEvent)
+    //setYY(event.nativeEvent.locationX)
+    setDateModalVisible(true)
+  }
+  
+
+  const getSeeingDate = () => { 
+    debugger
+    const {isValid,date} = isValidHebDateStr(seeing)
+    const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
+    return {date,dateStr}
+  }
+
+  const getPrevSeeingDate = () => { 
+    const {isValid,date} = isValidHebDateStr(prevSeeing)
+    const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
+    return {date,dateStr}
+  }  
 
   
-  useEffect(() => {
-    // textRef.current.setNativeProps({
-    //   text:'moshe1'
-    // });    
-    console.log(name);
-  }, [name])
-  
-  
+  // useEffect(() => {
+  //   seeingRef.current.setNativeProps({
+  //     text:'moshe1'
+  //   });    
+  //   console.log(seeing);
+  // }, [seeing])
 
-  return (
-    <View style={styles.mainContainer}>
-      <Text style={styles.header}>כותרת</Text>
-      
-      <View style={{...styles.revHorizontalContainer,marginTop:5}}>
-        <Text style={{fontSize:30,marginLeft:20,borderWidth:0,color:'black'}}>שם</Text>
-        <TextInput style={styles.hebrewInput} ref={textRef}  placeholder='שם' onChangeText={onChangeName}/>
+  return ( <>
+  {/* <View style={{position: 'absolute', top: 20, left:20, right: 0, bottom: 0}}>
+    <Text>Centered text</Text>
+  </View> */}
+
+  <View style={styles.mainContainer}>
+    {/* {dateModalVisible && <DatePicker/> } */}
+
+    <Text style={styles.header}>ספרה לה</Text>
+    <View style={{...styles.dataContainer}}>
+      <View style={{...styles.inputContainer}}>
+        <Text style={{fontSize:30,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם</Text>
+        <Button title='Date' color="cyan" onPress={showDateModal}/>
+        <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/>
       </View>
-      
+     
+      <View style={{...styles.inputContainer}}>
+        <Text style={{fontSize:30,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
+        <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/>
+      </View>
     </View>
+
+    <Section caption='עונה' text={switchVal ? 'יום':'לילה' }>
+    <Switch
+        style={{ transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }],marginRight:30,marginTop:10}}
+        trackColor={{ false: "black", true: "#81b0ff" }}
+        thumbColor={switchVal ? "#f5dd4b" : "gray"}
+        onValueChange={toggleSwitch}
+        value={switchVal}
+      />      
+    </Section>
+
+      <View style={{flex:5}}>
+        <Section caption='ראיה' text={getSeeingDate().dateStr}/>
+        <Section caption='חודש' text={hodesh(getSeeingDate().date)}/>
+        <Section caption='בינונית' text={bienonit(getSeeingDate().date)}/>
+        <Section caption='הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflaga}/>
+        <Section caption='ימי הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflagaDays}/>
+      </View> 
+
+    </View>
+    </>
   );
 }
 
 
 const styles = StyleSheet.create({
   mainContainer: {
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-    fontSize:50,
+    flex:1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: '#F5FCFF',
+    // fontSize:40,
   },
-  revHorizontalContainer: {
+  inputContainer: {
     flexDirection:'row-reverse',
+    marginTop:5,
+    backgroundColor: '#F5FCFF',
+  },
+  dataContainer: {
+    flex:1,
+    flexDirection:'column',
     // justifyContent: 'center',
     // alignItems: 'center',
     backgroundColor: '#F5FCFF',
+  },
+  centerContainer:{
+    flex:1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header:{
     textAlign:'center',
@@ -57,11 +142,28 @@ const styles = StyleSheet.create({
     fontSize: 50,
   },
   hebrewInput: {
-    width:300,
+    width:'60%',
     backgroundColor: 'white',
     borderWidth:1,
     borderRadius:5,
     fontSize:20,
     textAlign: 'right'
+  },
+  textCaption: {
+    color:'green',
+    fontSize:40,
+    fontWeight:'bold'
+  },
+  datePicker:{
+    // flex:1,
+    // flexDirection:'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width:200,
+    height:50,
+    backgroundColor:'gray',
+    borderColor:'black',
+    borderRadius:5,
+    borderWidth:1
   }
 })

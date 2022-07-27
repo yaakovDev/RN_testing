@@ -2,17 +2,26 @@ import React,{useState} from 'react';
 import {LandingPage} from './src/pages/LandingPage'
 
 import {
+  Keyboard,
   Button,
   StyleSheet,
   Text,
   View,SafeAreaView ,
-  ScrollView,SectionList,FlatList, TextInput
+  ScrollView,SectionList,FlatList, TextInput,
+  TouchableWithoutFeedback
 } from 'react-native';
 
-
+const DismissKeyboard = ({children}) => { 
+  return <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={true}>
+      {children}
+  </TouchableWithoutFeedback>
+ }
+ 
+ 
 const App = () => {
 
  const [flatData,setFlatData] = useState(Array.from({ length: 100 }).map((_, i) => {name:`item ${i}`} ));
+
   
  const renderScrollView = () => { 
   return <ScrollView>
@@ -50,6 +59,10 @@ const _renderItem = ({item,index}) => {
 
 
   return (<LandingPage/>)
+
+    // <DismissKeyboard>
+      // <LandingPage />
+    // </DismissKeyboard>
     
   
     // <View style={styles.container}>
