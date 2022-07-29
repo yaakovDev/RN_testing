@@ -1,4 +1,4 @@
-import React,{useCallback,useMemo} from 'react';
+import React,{useCallback,useMemo, useRef} from 'react';
 import {  Text,  View, FlatList,StyleSheet} from 'react-native';
 
 
@@ -7,22 +7,33 @@ const hebrewMonths = ['','תשרי','חשון','כסלו','טבת','שבט','א�
 
 export const HebDateSpinner = () => {
 
+  const flatListRef= useRef(null)
+
+  const scrollToIndex = (index) => {
+    flatListRef.current.scrollToIndex({animated: true, index: index});
+  }
+
   const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
-    console.log("Visible items are", viewableItems);
-    console.log("iteration", changed);
+    console.log(viewableItems[0].index);
+    scrollToIndex(viewableItems[0].index)
   },[])
 
-  const viewabilityConfiguration  = useMemo(() => ({waitForInteraction: false,
-    viewAreaCoveragePercentThreshold: 50,
+  const viewabilityConfiguration  = useMemo(() => ({waitForInteraction: true,
+    viewAreaCoveragePercentThreshold: 100,
     minimumViewTime: 100}) ,[])
   
+  const getItemLayout = (data, index) => (
+      { length: 50, offset: 50 * index, index })
+    
 
   const renderFlatView = (data) => { 
     return <FlatList
+       ref={flatListRef}
        data={data}
        renderItem={({item,index}) => <Text style={styles.item}>{item.name}</Text>}
        onViewableItemsChanged={onViewableItemsChangedHandler}
        viewabilityConfig={viewabilityConfiguration }
+       getItemLayout={getItemLayout}
        keyExtractor={(_,index) => index.toString()}
        showsVerticalScrollIndicator={false}
        showsHorizontalScrollIndicator={false}      
