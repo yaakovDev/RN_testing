@@ -1,12 +1,14 @@
-import React,{useState} from 'react';
+import React,{useState,useCallback,useMemo} from 'react';
 import {LandingPage} from './src/pages/LandingPage'
+import {HebDateSpinner} from './src/components/HebDateSpinner'
+
 
 import {
   Keyboard,
-  Button,
+  Button,Pressable,
   StyleSheet,
   Text,
-  View,SafeAreaView ,
+  View,
   ScrollView,SectionList,FlatList, TextInput,
   TouchableWithoutFeedback
 } from 'react-native';
@@ -17,10 +19,27 @@ const DismissKeyboard = ({children}) => {
   </TouchableWithoutFeedback>
  }
  
- 
+
 const App = () => {
 
- const [flatData,setFlatData] = useState(Array.from({ length: 100 }).map((_, i) => {name:`item ${i}`} ));
+ const [flatData,setFlatData] = useState(Array.from({ length: 100 }).map((_, i) => ({name:`item ${i}`}) ));
+ const [date, setDate] = useState(new Date())
+
+ const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
+  console.log("Visible items are", viewableItems);
+  console.log("iteration", changed);
+  },[])
+
+  const viewabilityConfiguration  = useMemo(() => (
+    {
+    waitForInteraction: false,
+    viewAreaCoveragePercentThreshold: 50,
+    minimumViewTime: 100
+  }) ,[])
+
+
+
+
 
   
  const renderScrollView = () => { 
@@ -33,11 +52,15 @@ const App = () => {
   </ScrollView>
   }
 
-const renderFlatView = () => { 
+const renderFlatView = (_data) => { 
    return <FlatList
-      data={flatData}
+      data={_data}
       renderItem={_renderItem}
+      onViewableItemsChanged={onViewableItemsChangedHandler}
+      viewabilityConfig={viewabilityConfiguration}
       keyExtractor={(_,index) => index.toString()}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}      
     />
   }
 
@@ -50,15 +73,13 @@ const renderSectionList = () => {
     />
  }
 
-const _renderItem = ({item,index}) => {  
-    return <View style={styles.welcome}>
-      <Text style={styles.welcome} >Item {index}</Text>
-    </View>
+const _renderItem = ({item,index}) => {
+    return  <Text style={styles.item} >{item.name}</Text>
   }
 
 
 
-  return (<LandingPage/>)
+    // return (<LandingPage/>)
 
     // <DismissKeyboard>
       // <LandingPage />
@@ -68,32 +89,52 @@ const _renderItem = ({item,index}) => {
     // <View style={styles.container}>
     //   <Button title='Button1'/>
     //   <TextInput style={styles.commonInput} keyboardType='email-address'/>
-      
     //     {renderSectionList()}
-    //     {renderFlatView()}
+    //  {renderFlatView()}
     //     {renderScrollView()}
     //    <Button title='Button2'/>
     //  </View>
-  
+
+
+    return <HebDateSpinner/>
+    // return <View style={{flex:1,width:200}}>
+    //   <Text>Flat list</Text>
+    //   {renderFlatView(flatData)}
+    //   </View>
+    
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 30,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    // alignItems: 'center',
+   },
+  flatlist_container: {
+    //  flex: 1,
+    // flexDirection:'column',
+    height:150,
+    // width:60,
+    // flexDirection: 'row',
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // textAlign: 'center',
+    backgroundColor: 'gray',
+    paddingHorizontal:0,
+  },  
+  item: {
+    width:150,
+    height:40,
+    fontSize:30,
     textAlign: 'center',
     backgroundColor: 'cyan',
-    margin: 10,
+    color:'black',
+    marginBottom:1
   },
   flatButton: {
     color:'black',
     backgroundColor: 'cyan',
-    marginTop: 10,
   },
   commonInput: {
     width:200,

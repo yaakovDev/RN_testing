@@ -44,7 +44,6 @@ export const LandingPage = () => {
   
 
   const getSeeingDate = () => { 
-    debugger
     const {isValid,date} = isValidHebDateStr(seeing)
     const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
     return {date,dateStr}
@@ -113,8 +112,8 @@ export const LandingPage = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex:1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
     // backgroundColor: '#F5FCFF',
     // fontSize:40,
   },
