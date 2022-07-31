@@ -1,12 +1,56 @@
-import React,{useCallback,useMemo, useRef} from 'react';
-import {  Text,  View, FlatList,StyleSheet} from 'react-native';
+import React,{useCallback,useEffect,useRef} from 'react';
+import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
+import '../logics/hebDates'
 
 const _ITEM_HIGHT = 70;
-const daysOfMonth = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
-const hebrewMonths = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
+const _days = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
+const _months = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
+const _years = [...Array(20).keys()].map( (_,index)=> ({name:(770+index).gim()}))
+
+const OneSpinner = ({data,width,index}) => {
+
+  const listRef = useRef()
+
+  useEffect(() => {
+    if(index)
+      listRef.current.scrollToIndex({animated:true,index,viewPosition:-1})
+  },[])
+
+
+  const onScroll = useCallback((event) => {
+    const index = event.nativeEvent.contentOffset.y / (_ITEM_HIGHT);
+    const roundIndex = Math.round(index);
+    // console.log(roundIndex+1);
+  }, []); 
+
+  const getItemLayout = (data, index) => (
+      { length: _ITEM_HIGHT, offset: _ITEM_HIGHT * index, index })
+    
+  const renderItem = useCallback(({item}) => {
+        return <Text style={{...styles.flat_item,width}}>{item.name}</Text>
+  },[])
+    
+    return <FlatList
+       data={data}
+       renderItem={renderItem}
+       getItemLayout={getItemLayout}
+       keyExtractor={(_,index) => index.toString()}
+       showsVerticalScrollIndicator={false}
+       showsHorizontalScrollIndicator={false}      
+       snapToAlignment="start"
+       decelerationRate={"normal"}
+       snapToInterval={_ITEM_HIGHT+1}       
+       onScroll={onScroll}
+       ref={listRef}
+      //  onViewableItemsChanged={onViewableItemsChangedHandler}
+      //  viewabilityConfig={viewabilityConfiguration }
+     />
+}
+
 
 export const HebDateSpinner = () => {
 
+/*
   const monthFListRef= useRef(null)
   const daysFListRef= useRef(null)
 
@@ -21,37 +65,20 @@ export const HebDateSpinner = () => {
   const viewabilityConfiguration  = useMemo(() => ({waitForInteraction: true,
     viewAreaCoveragePercentThreshold: 100,
     minimumViewTime: 100}) ,[])
-  
-  const getItemLayout = (data, index) => (
-      { length: _ITEM_HIGHT, offset: _ITEM_HIGHT * index, index })
-    
-
-  const renderFlatView = (data) => { 
-    return <FlatList
-       //ref={flatListRef}
-       data={data}
-       renderItem={({item,index}) => <Text style={styles.item}>{item.name}</Text>}
-      //  onViewableItemsChanged={onViewableItemsChangedHandler}
-      //  viewabilityConfig={viewabilityConfiguration }
-       getItemLayout={getItemLayout}
-       keyExtractor={(_,index) => index.toString()}
-       showsVerticalScrollIndicator={false}
-       showsHorizontalScrollIndicator={false}      
-       snapToAlignment="start"
-       decelerationRate={"normal"}
-      snapToInterval={_ITEM_HIGHT+1}       
-     />
-   }
+*/    
    
   const renderSpinners = () => { 
     
     return (
       <>
-        <View style={{...styles.flatlist_container, width: 120}}>
-          {renderFlatView(hebrewMonths)}
+        <View style={{...styles.flatlist_container}}>
+          <OneSpinner width={120} data={_years} index={12}/>
         </View>
-        <View style={styles.flatlist_container}>
-          {renderFlatView(daysOfMonth)}
+        <View style={{...styles.flatlist_container}}>
+          <OneSpinner width={120} data={_months} index={12}/>
+        </View>
+        <View style={{...styles.flatlist_container}}>
+          <OneSpinner width={80} data={_days} index={4}/>
         </View>
       </>
     );
@@ -59,7 +86,7 @@ export const HebDateSpinner = () => {
  
   return <View style={{...styles.col_container,
     position:'absolute',
-    width:250,
+    width:320,
     height:3*_ITEM_HIGHT,
     // borderColor:'black',
     // borderWidth:2
@@ -87,10 +114,7 @@ export const HebDateSpinner = () => {
           opacity:.5
           }}>
       </View>
-
-
     </View>
-
 }
 
 const styles = StyleSheet.create({
@@ -105,19 +129,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
    },
   flatlist_container: {
-     flex: 1,
+     //flex: 1,
     // flexDirection:'column',
     height:'100%',
     // width:60,
-    // flexDirection: 'row',
+    // flexDirection: 'column-reverse',
     // justifyContent: 'center',
     // alignItems: 'center',
     // textAlign: 'center',
     backgroundColor: 'gray',
+    // borderColor:'black',
+    // borderWidth:2
     // paddingHorizontal:0,
   },  
-  item: {
-    width:90,
+  flat_item: {
     height:_ITEM_HIGHT,
     fontSize:40,
     textAlign: 'center',
