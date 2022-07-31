@@ -1,21 +1,21 @@
 import React,{useCallback,useMemo, useRef} from 'react';
 import {  Text,  View, FlatList,StyleSheet} from 'react-native';
 
-
+const _ITEM_HIGHT = 70;
 const daysOfMonth = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
 const hebrewMonths = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
 
 export const HebDateSpinner = () => {
 
-  const flatListRef= useRef(null)
+  const monthFListRef= useRef(null)
+  const daysFListRef= useRef(null)
 
-  const scrollToIndex = (index) => {
+  const scrollToIndex = (flatListRef,index) => {
     flatListRef.current.scrollToIndex({animated: true, index: index});
   }
 
   const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
-    console.log(viewableItems[0].index);
-    scrollToIndex(viewableItems[0].index)
+    scrollToIndex(monthFListRef,viewableItems[0].index)
   },[])
 
   const viewabilityConfiguration  = useMemo(() => ({waitForInteraction: true,
@@ -23,20 +23,23 @@ export const HebDateSpinner = () => {
     minimumViewTime: 100}) ,[])
   
   const getItemLayout = (data, index) => (
-      { length: 50, offset: 50 * index, index })
+      { length: _ITEM_HIGHT, offset: _ITEM_HIGHT * index, index })
     
 
   const renderFlatView = (data) => { 
     return <FlatList
-       ref={flatListRef}
+       //ref={flatListRef}
        data={data}
        renderItem={({item,index}) => <Text style={styles.item}>{item.name}</Text>}
-       onViewableItemsChanged={onViewableItemsChangedHandler}
-       viewabilityConfig={viewabilityConfiguration }
+      //  onViewableItemsChanged={onViewableItemsChangedHandler}
+      //  viewabilityConfig={viewabilityConfiguration }
        getItemLayout={getItemLayout}
        keyExtractor={(_,index) => index.toString()}
        showsVerticalScrollIndicator={false}
        showsHorizontalScrollIndicator={false}      
+       snapToAlignment="start"
+       decelerationRate={"normal"}
+      snapToInterval={_ITEM_HIGHT+1}       
      />
    }
    
@@ -57,7 +60,7 @@ export const HebDateSpinner = () => {
   return <View style={{...styles.col_container,
     position:'absolute',
     width:250,
-    height:150,
+    height:3*_ITEM_HIGHT,
     // borderColor:'black',
     // borderWidth:2
     }}>
@@ -68,7 +71,7 @@ export const HebDateSpinner = () => {
           position:'absolute',
           // flex:1,
           backgroundColor:'white',
-          height:45, 
+          height:(_ITEM_HIGHT-5), 
           width:'100%',
           opacity:.5
           }}>
@@ -76,10 +79,10 @@ export const HebDateSpinner = () => {
 
       <View style={{
           position:'absolute',
-          top:105,
+          top:(3*_ITEM_HIGHT-_ITEM_HIGHT+5),
           // flex:1,
           backgroundColor:'white',
-          height:45, 
+          height:_ITEM_HIGHT-5, 
           width:'100%',
           opacity:.5
           }}>
@@ -115,8 +118,8 @@ const styles = StyleSheet.create({
   },  
   item: {
     width:90,
-    height:50,
-    fontSize:30,
+    height:_ITEM_HIGHT,
+    fontSize:40,
     textAlign: 'center',
     // backgroundColor: 'cyan',
     marginBottom:1
