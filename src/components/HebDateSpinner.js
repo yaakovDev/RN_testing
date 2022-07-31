@@ -1,14 +1,16 @@
-import React,{useCallback,useEffect,useRef} from 'react';
+import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
 import '../logics/hebDates'
 
-const _ITEM_HIGHT = 70;
+const _ITEM_HIGHT = 100;
+const _EXTRA_MARGIN = 10;
 const _days = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
 const _months = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
-const _years = [...Array(20).keys()].map( (_,index)=> ({name:(770+index).gim()}))
+const _years = [...Array(120).keys()].map( (_,index)=> ({name:(770+index).gim()}))
 
 const OneSpinner = ({data,width,index}) => {
 
+  const [selectedIndex,setSelectedIndex] = useState(index)
   const listRef = useRef()
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const OneSpinner = ({data,width,index}) => {
   const onScroll = useCallback((event) => {
     const index = event.nativeEvent.contentOffset.y / (_ITEM_HIGHT);
     const roundIndex = Math.round(index);
-    // console.log(roundIndex+1);
+    setSelectedIndex(roundIndex)
   }, []); 
 
   const getItemLayout = (data, index) => (
@@ -39,7 +41,7 @@ const OneSpinner = ({data,width,index}) => {
        showsHorizontalScrollIndicator={false}      
        snapToAlignment="start"
        decelerationRate={"normal"}
-       snapToInterval={_ITEM_HIGHT+1}       
+       snapToInterval={_ITEM_HIGHT}       
        onScroll={onScroll}
        ref={listRef}
       //  onViewableItemsChanged={onViewableItemsChangedHandler}
@@ -87,9 +89,7 @@ export const HebDateSpinner = () => {
   return <View style={{...styles.col_container,
     position:'absolute',
     width:320,
-    height:3*_ITEM_HIGHT,
-    // borderColor:'black',
-    // borderWidth:2
+    height:3*_ITEM_HIGHT
     }}>
     
     <View style={{...styles.row_container,flex:1}}>{renderSpinners()}</View>
@@ -98,7 +98,7 @@ export const HebDateSpinner = () => {
           position:'absolute',
           // flex:1,
           backgroundColor:'white',
-          height:(_ITEM_HIGHT-5), 
+          height:(_ITEM_HIGHT-_EXTRA_MARGIN), 
           width:'100%',
           opacity:.5
           }}>
@@ -106,12 +106,12 @@ export const HebDateSpinner = () => {
 
       <View style={{
           position:'absolute',
-          top:(3*_ITEM_HIGHT-_ITEM_HIGHT+5),
+          top:(3*_ITEM_HIGHT-_ITEM_HIGHT+_EXTRA_MARGIN),
           // flex:1,
           backgroundColor:'white',
-          height:_ITEM_HIGHT-5, 
+          height:_ITEM_HIGHT-_EXTRA_MARGIN, 
           width:'100%',
-          opacity:.5
+          opacity:.4
           }}>
       </View>
     </View>
@@ -146,7 +146,8 @@ const styles = StyleSheet.create({
     height:_ITEM_HIGHT,
     fontSize:40,
     textAlign: 'center',
-    // backgroundColor: 'cyan',
-    marginBottom:1
+    paddingTop:20,
+    // borderColor:'black',
+    // borderWidth:1,
   },
 });
