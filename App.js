@@ -96,7 +96,13 @@ const _renderItem = ({item,index}) => {
     //  </View>
 
 
-    return <HebDateSpinner/>
+    return <View>
+      <HebDateSpinner size='small'/>
+      <View style={{height:5}}/>
+      <HebDateSpinner size='medium'/>
+      <View style={{height:5}}/>
+      <HebDateSpinner size='large'/>
+    </View>
     // return <View style={{flex:1,width:200}}>
     //   <Text>Flat list</Text>
     //   {renderFlatView(flatData)}

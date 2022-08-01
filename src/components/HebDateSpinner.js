@@ -2,13 +2,11 @@ import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
 import '../logics/hebDates'
 
-const _ITEM_HIGHT = 100;
-const _EXTRA_MARGIN = 10;
 const _days = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
 const _months = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
 const _years = [...Array(120).keys()].map( (_,index)=> ({name:(770+index).gim()}))
 
-const OneSpinner = ({data,width,index}) => {
+const OneSpinner = ({data,width,index,_height,flat_item}) => {
 
   const [selectedIndex,setSelectedIndex] = useState(index)
   const listRef = useRef()
@@ -20,16 +18,16 @@ const OneSpinner = ({data,width,index}) => {
 
 
   const onScroll = useCallback((event) => {
-    const index = event.nativeEvent.contentOffset.y / (_ITEM_HIGHT);
+    const index = event.nativeEvent.contentOffset.y / _height;
     const roundIndex = Math.round(index);
     setSelectedIndex(roundIndex)
   }, []); 
 
   const getItemLayout = (data, index) => (
-      { length: _ITEM_HIGHT, offset: _ITEM_HIGHT * index, index })
+      { length: _height, offset: _height* index, index })
     
   const renderItem = useCallback(({item}) => {
-        return <Text style={{...styles.flat_item,width}}>{item.name}</Text>
+        return <Text style={{...flat_item,height:_height,width}}>{item.name}</Text>
   },[])
     
     return <FlatList
@@ -41,7 +39,7 @@ const OneSpinner = ({data,width,index}) => {
        showsHorizontalScrollIndicator={false}      
        snapToAlignment="start"
        decelerationRate={"normal"}
-       snapToInterval={_ITEM_HIGHT}       
+       snapToInterval={_height}       
        onScroll={onScroll}
        ref={listRef}
       //  onViewableItemsChanged={onViewableItemsChangedHandler}
@@ -50,76 +48,46 @@ const OneSpinner = ({data,width,index}) => {
 }
 
 
-export const HebDateSpinner = () => {
+export const HebDateSpinner = ({size}) => {
 
-/*
-  const monthFListRef= useRef(null)
-  const daysFListRef= useRef(null)
-
-  const scrollToIndex = (flatListRef,index) => {
-    flatListRef.current.scrollToIndex({animated: true, index: index});
+  //let item_style
+  let flat_item
+  let w1,w2
+  switch(size){
+    case 'small':{w1=80;w2=40;flat_item=styles.small_flat_item};break;
+    case 'medium':{w1=100;w2=60;flat_item=styles.medium_flat_item};break;
+    case 'large':{w1=120;w2=80;flat_item=styles.large_flat_item};break;
+    default: {w1=100;w2=60;flat_item=styles.medium_flat_item};break;
   }
 
-  const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
-    scrollToIndex(monthFListRef,viewableItems[0].index)
-  },[])
-
-  const viewabilityConfiguration  = useMemo(() => ({waitForInteraction: true,
-    viewAreaCoveragePercentThreshold: 100,
-    minimumViewTime: 100}) ,[])
-*/    
-   
   const renderSpinners = () => { 
-    
     return (
       <>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={120} data={_years} index={12}/>
+          <OneSpinner width={w1} data={_years} index={1} _height={flat_item._height} flat_item={flat_item}/>
         </View>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={120} data={_months} index={12}/>
+          <OneSpinner width={w1} data={_months} index={1} _height={flat_item._height} flat_item={flat_item}/>
         </View>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={80} data={_days} index={4}/>
+          <OneSpinner width={w2} data={_days} index={1} _height={flat_item._height} flat_item={flat_item}/>
         </View>
       </>
     );
    }
  
-  return <View style={{...styles.col_container,
-    position:'absolute',
-    width:320,
-    height:3*_ITEM_HIGHT
-    }}>
-    
-    <View style={{...styles.row_container,flex:1}}>{renderSpinners()}</View>
-
-      <View style={{
-          position:'absolute',
-          // flex:1,
-          backgroundColor:'white',
-          height:(_ITEM_HIGHT-_EXTRA_MARGIN), 
-          width:'100%',
-          opacity:.5
-          }}>
-      </View>    
-
-      <View style={{
-          position:'absolute',
-          top:(3*_ITEM_HIGHT-_ITEM_HIGHT+_EXTRA_MARGIN),
-          // flex:1,
-          backgroundColor:'white',
-          height:_ITEM_HIGHT-_EXTRA_MARGIN, 
-          width:'100%',
-          opacity:.4
-          }}>
+  return <View style={{...styles.col_container,position:'relative',width:(w1+w1+w2),height:3*flat_item._height}}>
+      <View style={{...styles.row_container,flex:1}}>
+          {renderSpinners()}
       </View>
+      <View style={{position:'absolute',backgroundColor:'white',height:(flat_item._height-flat_item._extraMargin),width:'100%',opacity:.4}}/>
+      <View style={{position:'absolute',top:(3*flat_item._height-flat_item._height+flat_item._extraMargin),backgroundColor:'white',height:flat_item._height-flat_item._extraMargin,width:'100%',opacity:.4}}/>
     </View>
 }
 
 const styles = StyleSheet.create({
   col_container: {
-    flex: 1,
+    // flex: 1,
     flexDirection: 'column',
   },
   row_container: {
@@ -129,25 +97,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
    },
   flatlist_container: {
-     //flex: 1,
-    // flexDirection:'column',
     height:'100%',
-    // width:60,
-    // flexDirection: 'column-reverse',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // textAlign: 'center',
     backgroundColor: 'gray',
-    // borderColor:'black',
-    // borderWidth:2
-    // paddingHorizontal:0,
   },  
-  flat_item: {
-    height:_ITEM_HIGHT,
+  large_flat_item: {
     fontSize:40,
     textAlign: 'center',
-    paddingTop:20,
-    // borderColor:'black',
-    // borderWidth:1,
+    paddingTop:10,
+    _height:100,
+    _extraMargin:10
   },
+  medium_flat_item: {
+    fontSize:30,
+    textAlign: 'center',
+    paddingTop:10,
+    _height:60,
+    _extraMargin:5,
+  },  
+  small_flat_item: {
+    fontSize:20,
+    textAlign: 'center',
+    paddingTop:5,
+    _height:40,
+    _extraMargin:5,
+  },   
 });

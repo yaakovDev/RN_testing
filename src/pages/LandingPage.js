@@ -1,6 +1,7 @@
 import React,{useState,useRef,useEffect, useLayoutEffect} from 'react';
 import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
+import { HebDateSpinner} from '../components/HebDateSpinner'
 
 import {
   Button,Switch,Alert,Modal,
@@ -21,11 +22,12 @@ const Section = ({caption,text,children}) => {
 
  const DatePicker = () => { 
     return (<Modal transparent>
-        <View style={{...styles.mainContainer,flexDirection:'row'}}>
+        <HebDateSpinner size='medium'/>
+        {/* <View style={{...styles.mainContainer,flexDirection:'row'}}>
           <View style={styles.datePicker}>
             <Text>My Modal</Text>
           </View>
-        </View>
+        </View> */}
     </Modal>)
   }
 
@@ -69,7 +71,7 @@ export const LandingPage = () => {
   </View> */}
 
   <View style={styles.mainContainer}>
-    {/* {dateModalVisible && <DatePicker/> } */}
+    {dateModalVisible && <DatePicker/> }
 
     <Text style={styles.header}>ספרה לה</Text>
     <View style={{...styles.dataContainer}}>
