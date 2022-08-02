@@ -22,7 +22,7 @@ const Section = ({caption,text,children}) => {
 
  const DatePicker = () => { 
     return (<Modal transparent>
-        <HebDateSpinner size='medium'/>
+        <HebDateSpinner size='medium' addPadding={false}/>
         {/* <View style={{...styles.mainContainer,flexDirection:'row'}}>
           <View style={styles.datePicker}>
             <Text>My Modal</Text>
@@ -37,6 +37,8 @@ export const LandingPage = () => {
   const [seeing, onChangeSeeing] = useState("")
   const [switchVal,toggleSwitch] = useState(false)
   const seeingRef = useRef()
+  const cd = currentTDate()
+  const dmy = {d:cd.day,m:cd.month,y:cd.year}
 
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)
@@ -76,14 +78,16 @@ export const LandingPage = () => {
     <Text style={styles.header}>ספרה לה</Text>
     <View style={{...styles.dataContainer}}>
       <View style={{...styles.inputContainer}}>
-        <Text style={{fontSize:30,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם</Text>
-        <Button title='Date' color="cyan" onPress={showDateModal}/>
-        <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/>
+        <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם </Text>
+        {/* <Button title='Date' color="cyan" onPress={showDateModal}/> */}
+        {/* <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/> */}
+        <HebDateSpinner size='medium' addPadding={false} dmy={dmy}/>
       </View>
      
       <View style={{...styles.inputContainer}}>
-        <Text style={{fontSize:30,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
-        <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/>
+        <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
+        {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
+        <HebDateSpinner size='medium' addPadding={false} dmy={dmy}/>
       </View>
     </View>
 

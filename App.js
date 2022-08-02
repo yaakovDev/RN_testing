@@ -79,7 +79,7 @@ const _renderItem = ({item,index}) => {
 
 
 
-    // return (<LandingPage/>)
+    return (<LandingPage/>)
 
     // <DismissKeyboard>
       // <LandingPage />
@@ -96,13 +96,13 @@ const _renderItem = ({item,index}) => {
     //  </View>
 
 
-    return <View>
-      <HebDateSpinner size='small'/>
-      <View style={{height:5}}/>
-      <HebDateSpinner size='medium'/>
-      <View style={{height:5}}/>
-      <HebDateSpinner size='large'/>
-    </View>
+    // return <View>
+    //   <HebDateSpinner size='small' addPadding={true}/>
+    //   <View style={{height:5}}/>
+    //   <HebDateSpinner size='medium' addPadding={false}/>
+    //   <View style={{height:5}}/>
+    //   <HebDateSpinner size='large' addPadding={true}/>
+    // </View>
     // return <View style={{flex:1,width:200}}>
     //   <Text>Flat list</Text>
     //   {renderFlatView(flatData)}

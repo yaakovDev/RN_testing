@@ -2,11 +2,12 @@ import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
 import '../logics/hebDates'
 
-const _days = ['','א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל',''].map( i=> ({name:i}))
-const _months = ['','תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול',''].map( i=> ({name:i}))
-const _years = [...Array(120).keys()].map( (_,index)=> ({name:(770+index).gim()}))
+const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( i=> ({name:i}))
+const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( i=> ({name:i}))
+const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim()}))
 
-const OneSpinner = ({data,width,index,_height,flat_item}) => {
+
+const OneSpinner = ({data,width,index,_height,flat_item,addPadding}) => {
 
   const [selectedIndex,setSelectedIndex] = useState(index)
   const listRef = useRef()
@@ -29,10 +30,20 @@ const OneSpinner = ({data,width,index,_height,flat_item}) => {
   const renderItem = useCallback(({item}) => {
         return <Text style={{...flat_item,height:_height,width}}>{item.name}</Text>
   },[])
+
+  const renderEmptyItem = useCallback( () => {
+    if ( addPadding )
+      return <Text style={{...flat_item,height:_height,width}}></Text>
+    else
+      return null
+},[])
+  
     
     return <FlatList
        data={data}
+       ListHeaderComponent={renderEmptyItem}
        renderItem={renderItem}
+       ListFooterComponent={renderEmptyItem}
        getItemLayout={getItemLayout}
        keyExtractor={(_,index) => index.toString()}
        showsVerticalScrollIndicator={false}
@@ -42,17 +53,16 @@ const OneSpinner = ({data,width,index,_height,flat_item}) => {
        snapToInterval={_height}       
        onScroll={onScroll}
        ref={listRef}
-      //  onViewableItemsChanged={onViewableItemsChangedHandler}
-      //  viewabilityConfig={viewabilityConfiguration }
      />
 }
 
 
-export const HebDateSpinner = ({size}) => {
+export const HebDateSpinner = ({size,addPadding,dmy}) => {
 
   //let item_style
   let flat_item
   let w1,w2
+  let _rows = addPadding ? 3 : 1
   switch(size){
     case 'small':{w1=80;w2=40;flat_item=styles.small_flat_item};break;
     case 'medium':{w1=100;w2=60;flat_item=styles.medium_flat_item};break;
@@ -60,28 +70,37 @@ export const HebDateSpinner = ({size}) => {
     default: {w1=100;w2=60;flat_item=styles.medium_flat_item};break;
   }
 
+  const getYearIndex = (year) => { 
+    if ( year) {
+      const index =  _years.findIndex( i=> i.year == year)
+      return index === -1 ? 1 : index
+      }
+    else
+      return 1
+  }
+   
   const renderSpinners = () => { 
     return (
       <>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w1} data={_years} index={1} _height={flat_item._height} flat_item={flat_item}/>
+          <OneSpinner width={w1} data={_years} index={getYearIndex(dmy?.y)} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
         </View>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w1} data={_months} index={1} _height={flat_item._height} flat_item={flat_item}/>
+          <OneSpinner width={w1} data={_months} index={dmy?.m-1} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
         </View>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w2} data={_days} index={1} _height={flat_item._height} flat_item={flat_item}/>
+          <OneSpinner width={w2} data={_days} index={dmy?.d} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
         </View>
       </>
     );
    }
  
-  return <View style={{...styles.col_container,position:'relative',width:(w1+w1+w2),height:3*flat_item._height}}>
+  return <View style={{...styles.col_container,position:'relative',width:(w1+w1+w2),height:_rows*flat_item._height}}>
       <View style={{...styles.row_container,flex:1}}>
           {renderSpinners()}
       </View>
-      <View style={{position:'absolute',backgroundColor:'white',height:(flat_item._height-flat_item._extraMargin),width:'100%',opacity:.4}}/>
-      <View style={{position:'absolute',top:(3*flat_item._height-flat_item._height+flat_item._extraMargin),backgroundColor:'white',height:flat_item._height-flat_item._extraMargin,width:'100%',opacity:.4}}/>
+      {addPadding && <View style={{position:'absolute',backgroundColor:'white',height:(flat_item._height-flat_item._extraMargin),width:'100%',opacity:.4}}/>}
+      {addPadding && <View style={{position:'absolute',top:(_rows*flat_item._height-flat_item._height+flat_item._extraMargin),backgroundColor:'white',height:flat_item._height-flat_item._extraMargin,width:'100%',opacity:.4}}/>}
     </View>
 }
 
