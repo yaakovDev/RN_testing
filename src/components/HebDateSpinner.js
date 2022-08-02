@@ -2,14 +2,14 @@ import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
 import '../logics/hebDates'
 
-const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( i=> ({name:i}))
-const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( i=> ({name:i}))
+const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
+const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
 const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim()}))
 
 
-const OneSpinner = ({data,width,index,_height,flat_item,addPadding}) => {
+const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChange}) => {
 
-  const [selectedIndex,setSelectedIndex] = useState(index)
+  // const [selectedIndex,setSelectedIndex] = useState(index)
   const listRef = useRef()
 
   useEffect(() => {
@@ -21,7 +21,9 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding}) => {
   const onScroll = useCallback((event) => {
     const index = event.nativeEvent.contentOffset.y / _height;
     const roundIndex = Math.round(index);
-    setSelectedIndex(roundIndex)
+    // setSelectedIndex(roundIndex)
+    if ( onSpinnerChange )
+      onSpinnerChange(data[roundIndex])
   }, []); 
 
   const getItemLayout = (data, index) => (
@@ -57,9 +59,10 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding}) => {
 }
 
 
-export const HebDateSpinner = ({size,addPadding,dmy}) => {
+export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
 
-  //let item_style
+  // const dmy = useRef(dmy)
+
   let flat_item
   let w1,w2
   let _rows = addPadding ? 3 : 1
@@ -78,18 +81,60 @@ export const HebDateSpinner = ({size,addPadding,dmy}) => {
     else
       return 1
   }
+
+  const onYearSpinnerChange = (item) => { 
+    dmy.y = item.year
+    if(onSpinnerChange)
+      onSpinnerChange(dmy)
+  }
+
+  const onMonthSpinnerChange = (item) => { 
+    dmy.m = item.month
+    if(onSpinnerChange)
+      onSpinnerChange(dmy)
+  }
+
+  const onDaySpinnerChange = (item) => { 
+    dmy.d = item.day
+    if(onSpinnerChange)
+      onSpinnerChange(dmy)
+  }
    
   const renderSpinners = () => { 
     return (
       <>
-        <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w1} data={_years} index={getYearIndex(dmy?.y)} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
+        <View style={{...styles.flatlist_container,borderLeftColor:'black',borderRightWidth:1}}>
+          <OneSpinner
+            width={w1}
+            data={_years}
+            index={getYearIndex(dmy?.y)}
+            _height={flat_item._height}
+            flat_item={flat_item}
+            addPadding={addPadding}
+            onSpinnerChange={onYearSpinnerChange}
+          />
+        </View>
+        <View style={{...styles.flatlist_container,borderLeftColor:'black',borderRightWidth:1}}>
+          <OneSpinner
+            width={w1}
+            data={_months}
+            index={dmy?.m - 1}
+            _height={flat_item._height}
+            flat_item={flat_item}
+            addPadding={addPadding}
+            onSpinnerChange={onMonthSpinnerChange}
+          />
         </View>
         <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w1} data={_months} index={dmy?.m-1} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
-        </View>
-        <View style={{...styles.flatlist_container}}>
-          <OneSpinner width={w2} data={_days} index={dmy?.d} _height={flat_item._height} flat_item={flat_item} addPadding={addPadding}/>
+          <OneSpinner
+            width={w2}
+            data={_days}
+            index={dmy?.d}
+            _height={flat_item._height}
+            flat_item={flat_item}
+            addPadding={addPadding}
+            onSpinnerChange={onDaySpinnerChange}
+          />
         </View>
       </>
     );

@@ -1,15 +1,8 @@
-import React,{useState,useRef,useEffect, useLayoutEffect} from 'react';
+import React,{useState} from 'react';
 import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 import { HebDateSpinner} from '../components/HebDateSpinner'
-
-import {
-  Button,Switch,Alert,Modal,
-  StyleSheet,
-  Text,
-  View,SafeAreaView ,
-  ScrollView,SectionList,FlatList, TextInput, LogBox,
-} from 'react-native';
+import {Switch,Modal,StyleSheet,Text,View} from 'react-native';
 
 const Section = ({caption,text,children}) => { 
   return (
@@ -33,12 +26,10 @@ const Section = ({caption,text,children}) => {
 
 export const LandingPage = () => {
   const [dateModalVisible,setDateModalVisible] = useState(false)
-  const [prevSeeing, onChangePrevSeeing] = useState("")
-  const [seeing, onChangeSeeing] = useState("")
   const [switchVal,toggleSwitch] = useState(false)
-  const seeingRef = useRef()
   const cd = currentTDate()
-  const dmy = {d:cd.day,m:cd.month,y:cd.year}
+  const [seeing,setSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
+  const [prevSeeing,setPrevSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
 
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)
@@ -48,24 +39,30 @@ export const LandingPage = () => {
   
 
   const getSeeingDate = () => { 
-    const {isValid,date} = isValidHebDateStr(seeing)
-    const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
-    return {date,dateStr}
+    const date = newTDate(seeing)
+    //const {isValid,date} = isValidHebDateStr(seeing)
+    // const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
+    return {date,dateStr:date?.dmyFormat()}
   }
 
   const getPrevSeeingDate = () => { 
-    const {isValid,date} = isValidHebDateStr(prevSeeing)
-    const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
-    return {date,dateStr}
+    // const {isValid,date} = isValidHebDateStr(prevSeeing)
+    // const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
+    // return {date,dateStr}
+    const date = newTDate(prevSeeing)
+    //const {isValid,date} = isValidHebDateStr(seeing)
+    // const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
+    return {date,dateStr:date?.dmyFormat()}    
   }  
 
-  
-  // useEffect(() => {
-  //   seeingRef.current.setNativeProps({
-  //     text:'moshe1'
-  //   });    
-  //   console.log(seeing);
-  // }, [seeing])
+  const onPrevSpinnerChange = (dmy) => { 
+    //setSeeing(dmy) --> no good!, dmy and seeing are same object, hence screen will not update
+    setSeeing({d:dmy.d,m:dmy.m,y:dmy.y})
+  }
+
+  const onLastSpinnerChange = (dmy) => { 
+    setPrevSeeing({d:dmy.d,m:dmy.m,y:dmy.y})
+  }
 
   return ( <>
   {/* <View style={{position: 'absolute', top: 20, left:20, right: 0, bottom: 0}}>
@@ -81,13 +78,13 @@ export const LandingPage = () => {
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם </Text>
         {/* <Button title='Date' color="cyan" onPress={showDateModal}/> */}
         {/* <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={dmy}/>
+        <HebDateSpinner size='medium' addPadding={false} dmy={prevSeeing} onSpinnerChange={onLastSpinnerChange}/>
       </View>
      
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
         {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={dmy}/>
+        <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onPrevSpinnerChange}/>
       </View>
     </View>
 
@@ -102,7 +99,7 @@ export const LandingPage = () => {
     </Section>
 
       <View style={{flex:5}}>
-        <Section caption='ראיה' text={getSeeingDate().dateStr}/>
+        {/* <Section caption='ראיה' text={getSeeingDate().dateStr}/> */}
         <Section caption='חודש' text={hodesh(getSeeingDate().date)}/>
         <Section caption='בינונית' text={bienonit(getSeeingDate().date)}/>
         <Section caption='הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflaga}/>
@@ -118,10 +115,6 @@ export const LandingPage = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex:1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // backgroundColor: '#F5FCFF',
-    // fontSize:40,
   },
   inputContainer: {
     flexDirection:'row-reverse',
@@ -131,8 +124,6 @@ const styles = StyleSheet.create({
   dataContainer: {
     flex:1,
     flexDirection:'column',
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
   centerContainer:{
@@ -160,8 +151,6 @@ const styles = StyleSheet.create({
     fontWeight:'bold'
   },
   datePicker:{
-    // flex:1,
-    // flexDirection:'column',
     justifyContent: 'center',
     alignItems: 'center',
     width:200,
