@@ -30,7 +30,7 @@ export const LandingPage = () => {
   const [switchVal,toggleSwitch] = useState(false)
   const cd = currentTDate()
   const [seeing,setSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
-  const [prevSeeing,setPrevSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
+  const [prevSeeing,setPrevSeeing] = useState({d:1,m:12,y:5781})
 
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)

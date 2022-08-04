@@ -17,7 +17,7 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 
   useEffect(() => {
     if(index)
-      listRef.current.scrollToIndex({animated:true,index,viewPosition:-1})
+      listRef.current.scrollToIndex({animated:true,index,viewPosition:addPadding ? -1 : 0})
   },[])
   
   const onScroll = useCallback((event) => {
@@ -86,14 +86,14 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
   const getYearIndex = (year) => { 
     if ( year) {
       const index =  _years.findIndex( i=> i.year == year)
-      return index === -1 ? 1 : index
+      console.log(`${year} - ${index}`);
+      return (index == -1) ? 1 : index
       }
     else
       return 1
   }
 
   const onYearSpinnerChange = (item) => {
-    console.log(`${item.year},${item.name},${item.inLeapYear}`)
     dmy.y = item.year
     setInLeapYear(item.inLeapYear)
     if(onSpinnerChange)
@@ -131,7 +131,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
         {inLeapYear && <OneSpinner
               width={w1}
               data={  _months_leap }
-              index={dmy?.m - 1}
+              index={dmy?.m-1 }
               _height={flat_item._height}
               flat_item={flat_item}
               addPadding={addPadding}
@@ -153,7 +153,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
           <OneSpinner
             width={w2}
             data={_days}
-            index={dmy?.d}
+            index={dmy?.d-1}
             _height={flat_item._height}
             flat_item={flat_item}
             addPadding={addPadding}
