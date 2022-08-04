@@ -4,12 +4,13 @@ import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 import { HebDateSpinner} from '../components/HebDateSpinner'
 import {Switch,Modal,StyleSheet,Text,View} from 'react-native';
 
-const Section = ({caption,text,children}) => { 
+const Section = ({caption,text,supText,children}) => { 
   return (
-  <View style={{...styles.inputContainer,marginTop:25}}>
+  <View style={{...styles.inputContainer,marginTop:20}}>
   <Text style={styles.textCaption}>{caption}:</Text>      
   {children}
-  <Text style={{fontSize:30,marginRight:20,marginTop:10,color:'black'}}>{text}</Text>
+  <Text style={{fontSize:25,marginRight:20,marginTop:5,color:'black'}}>{text}</Text>
+  <Text style={{fontSize:20,color:'gray'}}> {supText}</Text>
   </View>)
  }
 
@@ -98,12 +99,12 @@ export const LandingPage = () => {
       />      
     </Section>
 
-      <View style={{flex:5}}>
+      <View style={{flex:4}}>
         {/* <Section caption='ראיה' text={getSeeingDate().dateStr}/> */}
-        <Section caption='חודש' text={hodesh(getSeeingDate().date)}/>
-        <Section caption='בינונית' text={bienonit(getSeeingDate().date)}/>
-        <Section caption='הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflaga}/>
-        <Section caption='ימי הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflagaDays}/>
+        <Section caption='חודש' text={hodesh(getSeeingDate().date).hodesh} supText={hodesh(getSeeingDate().date).dayOfWeek}/>
+        <Section caption='בינונית' text={bienonit(getSeeingDate().date).bienonit} supText={bienonit(getSeeingDate().date).dayOfWeek}/>
+        <Section caption='הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflaga} supText={haflaga(getSeeingDate().date,getPrevSeeingDate().date).dayOfWeek}/>
+        <Section caption='ימי הפלגה' text={haflaga(getSeeingDate().date,getPrevSeeingDate().date).haflagaDays} />
       </View> 
 
     </View>
@@ -147,7 +148,7 @@ const styles = StyleSheet.create({
   },
   textCaption: {
     color:'green',
-    fontSize:40,
+    fontSize:30,
     fontWeight:'bold'
   },
   datePicker:{

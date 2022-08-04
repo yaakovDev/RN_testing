@@ -176,7 +176,7 @@ export const isDate = (obj) => {
 
 
 export const newTDate = ({d,m,y}) => { 
-  if(isValidHebDate({d,m,y}))
+  if(isValidHebDate({d,m,y})) 
     return Temporal.PlainDate.from({day:d,month:m,year:y,calendar:'hebrew'})
   else
     return null
@@ -203,7 +203,7 @@ export const currentTDate = () => {
 export const isValidHebDate = ({d,m,y}) => {
   if ( !d || !m || !y ) 
     return false
-  return (y>=5000 && y<=5999 && m>=1 && m<=13 && d>=1 && d<=31)
+  return (y>=5000 && y<=5999 && m>=1 && m<=13 && d>=1 && d<=30)
 }
 
 export const isValidHebDateStr = (dateStr) => {

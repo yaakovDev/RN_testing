@@ -1,29 +1,39 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
-import '../logics/hebDates'
+import {newTDate} from '../logics/hebDates'
 
 const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
 const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
-const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim()}))
+const _months_leap = ['תשרי','חשון','כסלו','טבת','שבט','אדר-א','אדר-ב','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
+const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim(),inLeapYear:newTDate({d:1,m:1,y:5770+index}).inLeapYear}))
 
 
 const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChange}) => {
 
-  // const [selectedIndex,setSelectedIndex] = useState(index)
   const listRef = useRef()
+  let timeout = useRef(0)
+  let prevIndex = useRef(-1)
+
 
   useEffect(() => {
     if(index)
       listRef.current.scrollToIndex({animated:true,index,viewPosition:-1})
   },[])
-
-
+  
   const onScroll = useCallback((event) => {
-    const index = event.nativeEvent.contentOffset.y / _height;
-    const roundIndex = Math.round(index);
-    // setSelectedIndex(roundIndex)
-    if ( onSpinnerChange )
-      onSpinnerChange(data[roundIndex])
+    const index = Math.round(event.nativeEvent.contentOffset.y / _height)
+    if ( index==prevIndex.current)
+      return
+
+    if ( !onSpinnerChange ) 
+      return
+
+    clearTimeout( timeout.current );
+    timeout.current = setTimeout( () => {
+      prevIndex.current = index
+      onSpinnerChange(data[index])
+      },100)
+  
   }, []); 
 
   const getItemLayout = (data, index) => (
@@ -61,7 +71,7 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 
 export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
 
-  // const dmy = useRef(dmy)
+  const [inLeapYear,setInLeapYear] = useState(null)
 
   let flat_item
   let w1,w2
@@ -82,8 +92,10 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
       return 1
   }
 
-  const onYearSpinnerChange = (item) => { 
+  const onYearSpinnerChange = (item) => {
+    console.log(`${item.year},${item.name},${item.inLeapYear}`)
     dmy.y = item.year
+    setInLeapYear(item.inLeapYear)
     if(onSpinnerChange)
       onSpinnerChange(dmy)
   }
@@ -114,16 +126,28 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
             onSpinnerChange={onYearSpinnerChange}
           />
         </View>
+
         <View style={{...styles.flatlist_container,borderLeftColor:'black',borderRightWidth:1}}>
-          <OneSpinner
-            width={w1}
-            data={_months}
-            index={dmy?.m - 1}
-            _height={flat_item._height}
-            flat_item={flat_item}
-            addPadding={addPadding}
-            onSpinnerChange={onMonthSpinnerChange}
-          />
+        {inLeapYear && <OneSpinner
+              width={w1}
+              data={  _months_leap }
+              index={dmy?.m - 1}
+              _height={flat_item._height}
+              flat_item={flat_item}
+              addPadding={addPadding}
+              onSpinnerChange={onMonthSpinnerChange}
+            />}
+
+        {!inLeapYear && <OneSpinner
+              width={w1}
+              data={_months}
+              index={dmy?.m - 1}
+              _height={flat_item._height}
+              flat_item={flat_item}
+              addPadding={addPadding}
+              onSpinnerChange={onMonthSpinnerChange}
+            />}
+
         </View>
         <View style={{...styles.flatlist_container}}>
           <OneSpinner
