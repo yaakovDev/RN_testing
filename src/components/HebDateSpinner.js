@@ -11,7 +11,7 @@ const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(77
 const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChange}) => {
 
   const listRef = useRef()
-  let timeout = useRef(0)
+  let spinner_timeout = useRef(0)
   let prevIndex = useRef(-1)
 
 
@@ -26,13 +26,13 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
       return
 
     if ( !onSpinnerChange ) 
-      return
+      return      
 
-    clearTimeout( timeout.current );
-    timeout.current = setTimeout( () => {
+    clearTimeout( spinner_timeout.current );
+    spinner_timeout.current = setTimeout( () => {
       prevIndex.current = index
       onSpinnerChange(data[index])
-      },100)
+      },200)
   
   }, []); 
 
@@ -71,7 +71,26 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 
 export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
 
-  const [inLeapYear,setInLeapYear] = useState(null)
+
+  // console.log(`re-rendring -  ${newTDate(dmy).dmyFormat()}`);
+  //using useState is the correct way to go here, but it has a nasty bug,
+  //pretty sure it's a react bug, as a workaround i used useRef
+  //const [inLeapYear,setInLeapYear] = useState(newTDate({d:1,m:1,y:dmy.y}).inLeapYear)
+  const isLeap = useRef(newTDate({d:1,m:1,y:dmy.y}).inLeapYear)  
+
+  const onYearSpinnerChange = (item) => {
+
+    if ( isLeap.current && !item.inLeapYear && dmy.m>6 )//from leapYear to simpleYear
+      dmy.m--
+    else if ( !isLeap.current && item.inLeapYear && dmy.m>6 && dmy.m<=12)//from to simpleYear to leapYear
+      dmy.m++
+    
+    // setInLeapYear(item.inLeapYear) //BUG !!! , state value isn't beeing preverved correctly
+    isLeap.current = item.inLeapYear
+    dmy = {...dmy,y:item.year}
+    console.log(`_dmy:${newTDate(dmy).dmyFormat()}`);
+    onSpinnerChange?.(dmy)
+  }  
 
   let flat_item
   let w1,w2
@@ -86,32 +105,22 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
   const getYearIndex = (year) => { 
     if ( year) {
       const index =  _years.findIndex( i=> i.year == year)
-      console.log(`${year} - ${index}`);
       return (index == -1) ? 1 : index
       }
     else
       return 1
   }
 
-  const onYearSpinnerChange = (item) => {
-    dmy.y = item.year
-    setInLeapYear(item.inLeapYear)
-    if(onSpinnerChange)
-      onSpinnerChange(dmy)
-  }
-
   const onMonthSpinnerChange = (item) => { 
-    dmy.m = item.month
-    if(onSpinnerChange)
-      onSpinnerChange(dmy)
+    dmy = {...dmy,m:item.month}
+    onSpinnerChange?.(dmy)//conditional func call syntax
   }
 
   const onDaySpinnerChange = (item) => { 
-    dmy.d = item.day
-    if(onSpinnerChange)
-      onSpinnerChange(dmy)
+    dmy = {...dmy,d:item.day}
+    onSpinnerChange?.(dmy)//conditional func call syntax
   }
-   
+  
   const renderSpinners = () => { 
     return (
       <>
@@ -126,28 +135,25 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
             onSpinnerChange={onYearSpinnerChange}
           />
         </View>
-
         <View style={{...styles.flatlist_container,borderLeftColor:'black',borderRightWidth:1}}>
-        {inLeapYear && <OneSpinner
+        {isLeap.current && <OneSpinner
               width={w1}
-              data={  _months_leap }
+              data={_months_leap}
               index={dmy?.m-1 }
               _height={flat_item._height}
               flat_item={flat_item}
               addPadding={addPadding}
               onSpinnerChange={onMonthSpinnerChange}
             />}
-
-        {!inLeapYear && <OneSpinner
+        {!isLeap.current && <OneSpinner
               width={w1}
               data={_months}
-              index={dmy?.m - 1}
+              index={dmy?.m-1 }
               _height={flat_item._height}
               flat_item={flat_item}
               addPadding={addPadding}
               onSpinnerChange={onMonthSpinnerChange}
             />}
-
         </View>
         <View style={{...styles.flatlist_container}}>
           <OneSpinner

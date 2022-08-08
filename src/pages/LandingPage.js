@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useRef} from 'react';
 import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 import { HebDateSpinner} from '../components/HebDateSpinner'
@@ -30,7 +30,7 @@ export const LandingPage = () => {
   const [switchVal,toggleSwitch] = useState(false)
   const cd = currentTDate()
   const [seeing,setSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
-  const [prevSeeing,setPrevSeeing] = useState({d:1,m:12,y:5781})
+  const [prevSeeing,setPrevSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
 
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)
@@ -57,12 +57,13 @@ export const LandingPage = () => {
   }  
 
   const onPrevSpinnerChange = (dmy) => { 
-    //setSeeing(dmy) --> no good!, dmy and seeing are same object, hence screen will not update
-    setSeeing({d:dmy.d,m:dmy.m,y:dmy.y})
+    console.log(`from: ${newTDate(dmy).dmyFormat()}`);
+    setPrevSeeing(dmy)
   }
 
   const onLastSpinnerChange = (dmy) => { 
-    setPrevSeeing({d:dmy.d,m:dmy.m,y:dmy.y})
+    console.log(`to: ${newTDate(dmy).dmyFormat()}`);
+    setSeeing(dmy)
   }
 
   return ( <>
@@ -73,19 +74,20 @@ export const LandingPage = () => {
   <View style={styles.mainContainer}>
     {dateModalVisible && <DatePicker/> }
 
-    <Text style={styles.header}>ספרה לה</Text>
+    <Text style={styles.header}>סָפְרָה לָה</Text>
+    
     <View style={{...styles.dataContainer}}>
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם </Text>
         {/* <Button title='Date' color="cyan" onPress={showDateModal}/> */}
         {/* <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={prevSeeing} onSpinnerChange={onLastSpinnerChange}/>
+        <HebDateSpinner size='medium' addPadding={false} dmy={prevSeeing} onSpinnerChange={onPrevSpinnerChange}/>
       </View>
      
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
         {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onPrevSpinnerChange}/>
+        <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onLastSpinnerChange}/>
       </View>
     </View>
 
