@@ -84,7 +84,7 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
   //   }, [dmy.current])
 
   const _setDmy = (_dmy) => { 
-    console.log(`${newTDate(dmy.current).dmyFormat()}->${newTDate(_dmy).dmyFormat()}`);
+    //console.log(`${newTDate(dmy.current).dmyFormat()}->${newTDate(_dmy).dmyFormat()}`);
     dmy.current = _dmy
     onSpinnerChange?.(_dmy)
     // setDmy( p => {
@@ -110,7 +110,7 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
     else if ( !isLeap.current && item.inLeapYear && _m>6 && _m<=12)//from to simpleYear to leapYear
       _m++
     
-    console.log(`${isLeap.current ? "L" : "NL"}->${item.inLeapYear ? "L" : "NL"} ,M:${_m}`);
+    //console.log(`${isLeap.current ? "L" : "NL"}->${item.inLeapYear ? "L" : "NL"} ,M:${_m}`);
     isLeap.current = item.inLeapYear
     // setIsLeap(item.inLeapYear) //BUG?, state value isn't beeing preverved correctly
     const newDmy = {...dmy.current,m:_m,y:item.year}

@@ -28,9 +28,8 @@ const Section = ({caption,text,supText,children}) => {
 export const LandingPage = () => {
   const [dateModalVisible,setDateModalVisible] = useState(false)
   const [switchVal,toggleSwitch] = useState(false)
-  const cd = currentTDate()
-  const [seeing,setSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
-  const [prevSeeing,setPrevSeeing] = useState({d:cd.day,m:cd.month,y:cd.year})
+  const [seeing,setSeeing] = useState()
+  const [prevSeeing,setPrevSeeing] = useState()
 
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)
@@ -56,16 +55,6 @@ export const LandingPage = () => {
     return {date,dateStr:date?.dmyFormat()}    
   }  
 
-  const onPrevSpinnerChange = (dmy) => { 
-    // console.log(`from: ${newTDate(dmy).dmyFormat()}`);
-    setPrevSeeing(dmy)
-  }
-
-  const onLastSpinnerChange = (dmy) => { 
-    // console.log(`to: ${newTDate(dmy).dmyFormat()}`);
-    setSeeing(dmy)
-  }
-
   return ( <>
   {/* <View style={{position: 'absolute', top: 20, left:20, right: 0, bottom: 0}}>
     <Text>Centered text</Text>
@@ -81,13 +70,13 @@ export const LandingPage = () => {
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם </Text>
         {/* <Button title='Date' color="cyan" onPress={showDateModal}/> */}
         {/* <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={prevSeeing} onSpinnerChange={onPrevSpinnerChange}/>
+        <HebDateSpinner size='medium' addPadding={false} xdmy={prevSeeing} onSpinnerChange={setPrevSeeing}/>
       </View>
      
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
         {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onLastSpinnerChange}/>
+        <HebDateSpinner size='medium' addPadding={false} xdmy={seeing} onSpinnerChange={setSeeing}/>
       </View>
     </View>
 

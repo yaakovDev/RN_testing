@@ -175,7 +175,7 @@ export const isDate = (obj) => {
 }
 
 
-export const newTDate = ({d,m,y}) => { 
+export const newTDate = ({d,m,y} = {d:null,m:null,y:null}) => { 
   if(isValidHebDate({d,m,y})) 
     return Temporal.PlainDate.from({day:d,month:m,year:y,calendar:'hebrew'})
   else
