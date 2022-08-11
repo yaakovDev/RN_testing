@@ -1,6 +1,8 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
-import {newTDate} from '../logics/hebDates'
+import gim,{newTDate,currentDate_dmy} from '../logics/hebDates'
+// import '../logics/hebDates'
+
 
 const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
 const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
@@ -11,13 +13,13 @@ const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(77
 const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChange}) => {
 
   const listRef = useRef()
-  let spinner_timeout = useRef(0)
-  let prevIndex = useRef(-1)
+  const spinner_timeout = useRef(0)
+  const prevIndex = useRef(-1)
 
 
   useEffect(() => {
     if(index)
-      listRef.current.scrollToIndex({animated:true,index,viewPosition:addPadding ? -1 : 0})
+      listRef.current.scrollToIndex({animated:true,index,viewPosition:addPadding ? 0 : 0})
   },[])
   
   const onScroll = useCallback((event) => {
@@ -32,7 +34,7 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
     spinner_timeout.current = setTimeout( () => {
       prevIndex.current = index
       onSpinnerChange(data[index])
-      },200)
+      },200)//<--return 200
   
   }, []); 
 
@@ -69,27 +71,50 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 }
 
 
-export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
+export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) => {
+
+  const __dmy = (_dmy) ? _dmy : currentDate_dmy()
+  // const [dmy,setDmy] = useState(__dmy)
+  // const [isLeap,setIsLeap] = useState(newTDate(__dmy).inLeapYear)
+  const dmy = useRef(__dmy)
+  const isLeap = useRef(newTDate(__dmy).inLeapYear)  
 
 
-  // console.log(`re-rendring -  ${newTDate(dmy).dmyFormat()}`);
-  //using useState is the correct way to go here, but it has a nasty bug,
-  //pretty sure it's a react bug, as a workaround i used useRef
-  //const [inLeapYear,setInLeapYear] = useState(newTDate({d:1,m:1,y:dmy.y}).inLeapYear)
-  const isLeap = useRef(newTDate({d:1,m:1,y:dmy.y}).inLeapYear)  
+  // useEffect(() => {
+  //   }, [dmy.current])
+
+  const _setDmy = (_dmy) => { 
+    console.log(`${newTDate(dmy.current).dmyFormat()}->${newTDate(_dmy).dmyFormat()}`);
+    dmy.current = _dmy
+    onSpinnerChange?.(_dmy)
+    // setDmy( p => {
+    //   console.log(`${newTDate(p).dmyFormat()}->${newTDate(dmy).dmyFormat()}`);
+    //   return dmy
+    //   })
+   }
+
+  const onMonthSpinnerChange = (item) => { 
+    const newDmy = {...dmy.current,m:item.month}
+    _setDmy(newDmy)
+  }
+
+  const onDaySpinnerChange = (item) => { 
+    const newDmy = {...dmy.current,d:item.day}
+    _setDmy(newDmy)
+  }
 
   const onYearSpinnerChange = (item) => {
-
-    if ( isLeap.current && !item.inLeapYear && dmy.m>6 )//from leapYear to simpleYear
-      dmy.m--
-    else if ( !isLeap.current && item.inLeapYear && dmy.m>6 && dmy.m<=12)//from to simpleYear to leapYear
-      dmy.m++
+    let _m = dmy.current.m
+    if ( isLeap.current && !item.inLeapYear && _m>6 )//from leapYear to simpleYear
+      _m--
+    else if ( !isLeap.current && item.inLeapYear && _m>6 && _m<=12)//from to simpleYear to leapYear
+      _m++
     
-    // setInLeapYear(item.inLeapYear) //BUG !!! , state value isn't beeing preverved correctly
+    console.log(`${isLeap.current ? "L" : "NL"}->${item.inLeapYear ? "L" : "NL"} ,M:${_m}`);
     isLeap.current = item.inLeapYear
-    dmy = {...dmy,y:item.year}
-    console.log(`_dmy:${newTDate(dmy).dmyFormat()}`);
-    onSpinnerChange?.(dmy)
+    // setIsLeap(item.inLeapYear) //BUG?, state value isn't beeing preverved correctly
+    const newDmy = {...dmy.current,m:_m,y:item.year}
+    _setDmy(newDmy)
   }  
 
   let flat_item
@@ -110,16 +135,6 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
     else
       return 1
   }
-
-  const onMonthSpinnerChange = (item) => { 
-    dmy = {...dmy,m:item.month}
-    onSpinnerChange?.(dmy)//conditional func call syntax
-  }
-
-  const onDaySpinnerChange = (item) => { 
-    dmy = {...dmy,d:item.day}
-    onSpinnerChange?.(dmy)//conditional func call syntax
-  }
   
   const renderSpinners = () => { 
     return (
@@ -128,7 +143,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
           <OneSpinner
             width={w1}
             data={_years}
-            index={getYearIndex(dmy?.y)}
+            index={getYearIndex(dmy.current?.y)}
             _height={flat_item._height}
             flat_item={flat_item}
             addPadding={addPadding}
@@ -139,7 +154,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
         {isLeap.current && <OneSpinner
               width={w1}
               data={_months_leap}
-              index={dmy?.m-1 }
+              index={(dmy.current?.m)-1 }
               _height={flat_item._height}
               flat_item={flat_item}
               addPadding={addPadding}
@@ -148,7 +163,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
         {!isLeap.current && <OneSpinner
               width={w1}
               data={_months}
-              index={dmy?.m-1 }
+              index={(dmy.current?.m)-1 }
               _height={flat_item._height}
               flat_item={flat_item}
               addPadding={addPadding}
@@ -159,7 +174,7 @@ export const HebDateSpinner = ({size,addPadding,dmy,onSpinnerChange}) => {
           <OneSpinner
             width={w2}
             data={_days}
-            index={dmy?.d-1}
+            index={dmy.current?.d-1}
             _height={flat_item._height}
             flat_item={flat_item}
             addPadding={addPadding}

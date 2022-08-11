@@ -1,6 +1,7 @@
 import React,{useState,useCallback,useMemo} from 'react';
 import {LandingPage} from './src/pages/LandingPage'
 import {HebDateSpinner} from './src/components/HebDateSpinner'
+import {newTDate} from './src/logics/hebDates'
 
 
 import {
@@ -24,6 +25,10 @@ const App = () => {
 
  const [flatData,setFlatData] = useState(Array.from({ length: 100 }).map((_, i) => ({name:`item ${i}`}) ));
  const [date, setDate] = useState(new Date())
+
+ const [smallDate,setSmallDate] = useState({d:1,m:1,y:5782})
+ const [mediumDate,setMediumDate] = useState({d:1,m:1,y:5782})
+ const [largeDate,setLargeDate] = useState({d:3,m:5,y:5783})
 
  const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
   console.log("Visible items are", viewableItems);
@@ -79,7 +84,7 @@ const _renderItem = ({item,index}) => {
 
 
 
-    return (<LandingPage/>)
+    // return (<LandingPage/>)
 
     // <DismissKeyboard>
       // <LandingPage />
@@ -96,13 +101,21 @@ const _renderItem = ({item,index}) => {
     //  </View>
 
 
-    // return <View>
-    //   <HebDateSpinner size='small' addPadding={true}/>
-    //   <View style={{height:5}}/>
-    //   <HebDateSpinner size='medium' addPadding={false}/>
-    //   <View style={{height:5}}/>
-    //   <HebDateSpinner size='large' addPadding={true}/>
-    // </View>
+    return <View>
+      <HebDateSpinner size='small' addPadding={true} xdmy={smallDate} onSpinnerChange={setSmallDate}/>
+      <View style={{height:5}}/>
+      <HebDateSpinner size='medium' addPadding={false} xdmy={mediumDate} onSpinnerChange={setMediumDate}/>
+      <View style={{height:5}}/>
+      <HebDateSpinner size='large' addPadding={true} xdmy={{d:3,m:5,y:5783}} onSpinnerChange={setLargeDate}/>
+
+
+      <Text style={{fontSize:30}}>{newTDate(smallDate).dmyFormat()}</Text>
+      <Text style={{fontSize:30}}>{newTDate(mediumDate).dmyFormat()}</Text>
+      <Text style={{fontSize:30}}>{newTDate(largeDate).dmyFormat()}</Text>
+    </View>
+
+    // <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onLastSpinnerChange}/>
+
     // return <View style={{flex:1,width:200}}>
     //   <Text>Flat list</Text>
     //   {renderFlatView(flatData)}

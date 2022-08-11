@@ -57,12 +57,12 @@ export const LandingPage = () => {
   }  
 
   const onPrevSpinnerChange = (dmy) => { 
-    console.log(`from: ${newTDate(dmy).dmyFormat()}`);
+    // console.log(`from: ${newTDate(dmy).dmyFormat()}`);
     setPrevSeeing(dmy)
   }
 
   const onLastSpinnerChange = (dmy) => { 
-    console.log(`to: ${newTDate(dmy).dmyFormat()}`);
+    // console.log(`to: ${newTDate(dmy).dmyFormat()}`);
     setSeeing(dmy)
   }
 

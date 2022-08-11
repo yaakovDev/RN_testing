@@ -199,6 +199,11 @@ export const currentTDate = () => {
   return new Temporal.Now.plainDate({calendar:'hebrew'})
 }
 
+export const currentDate_dmy = () => {
+  const t = new Temporal.Now.plainDate({calendar:'hebrew'})
+  return {d:t.day,m:t.month,y:t.year}
+}
+
 // validate date range
 export const isValidHebDate = ({d,m,y}) => {
   if ( !d || !m || !y ) 
@@ -250,7 +255,7 @@ const _isValidHebDateStr = (dateStr) => {
   return {isValid:true,date:newDate}
 }
 
-  
+export default { gim: Number.prototype.gim }
 
 
 
