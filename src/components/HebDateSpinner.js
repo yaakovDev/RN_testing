@@ -4,7 +4,8 @@ import gim,{newTDate,currentDate_dmy} from '../logics/hebDates'
 // import '../logics/hebDates'
 
 
-const _days = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
+const _days30 = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
+const _days29 = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט'].map( (i,index)=> ({day:index+1,name:i}))
 const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
 const _months_leap = ['תשרי','חשון','כסלו','טבת','שבט','אדר-א','אדר-ב','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
 const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim(),inLeapYear:newTDate({d:1,m:1,y:5770+index}).inLeapYear}))
@@ -34,7 +35,7 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
     spinner_timeout.current = setTimeout( () => {
       prevIndex.current = index
       onSpinnerChange(data[index])
-      },200)//<--return 200
+      },200)
   
   }, []); 
 
@@ -78,29 +79,27 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
   // const [isLeap,setIsLeap] = useState(newTDate(__dmy).inLeapYear)
   const dmy = useRef(__dmy)
   const isLeap = useRef(newTDate(__dmy).inLeapYear)  
-
-
-  // useEffect(() => {
-  //   }, [dmy.current])
+  const isFullMonth = useRef((newTDate({...__dmy,d:30}).day==30))  
 
   const _setDmy = (_dmy) => { 
     //console.log(`${newTDate(dmy.current).dmyFormat()}->${newTDate(_dmy).dmyFormat()}`);
     dmy.current = _dmy
     onSpinnerChange?.(_dmy)
-    // setDmy( p => {
-    //   console.log(`${newTDate(p).dmyFormat()}->${newTDate(dmy).dmyFormat()}`);
-    //   return dmy
-    //   })
    }
 
-  const onMonthSpinnerChange = (item) => { 
-    const newDmy = {...dmy.current,m:item.month}
-    _setDmy(newDmy)
+  const onDaySpinnerChange = (item) => { 
+    _setDmy({...dmy.current,d:item.day})
   }
 
-  const onDaySpinnerChange = (item) => { 
-    const newDmy = {...dmy.current,d:item.day}
-    _setDmy(newDmy)
+  const onMonthSpinnerChange = (item) => {
+
+    let _d = dmy.current.d
+    const isToFullMonth = (newTDate({y:dmy.current.y,m:item.month,d:30}).day==30)  
+    if ( !isToFullMonth && _d==30) 
+        _d=29
+
+    isFullMonth.current = isToFullMonth
+    _setDmy({...dmy.current,d:_d,m:item.month})
   }
 
   const onYearSpinnerChange = (item) => {
@@ -110,11 +109,9 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
     else if ( !isLeap.current && item.inLeapYear && _m>6 && _m<=12)//from to simpleYear to leapYear
       _m++
     
-    //console.log(`${isLeap.current ? "L" : "NL"}->${item.inLeapYear ? "L" : "NL"} ,M:${_m}`);
     isLeap.current = item.inLeapYear
-    // setIsLeap(item.inLeapYear) //BUG?, state value isn't beeing preverved correctly
-    const newDmy = {...dmy.current,m:_m,y:item.year}
-    _setDmy(newDmy)
+    // setIsLeap(item.inLeapYear)
+    _setDmy({...dmy.current,m:_m,y:item.year})
   }  
 
   let flat_item
@@ -170,17 +167,30 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
               onSpinnerChange={onMonthSpinnerChange}
             />}
         </View>
+        {isFullMonth.current && 
         <View style={{...styles.flatlist_container}}>
           <OneSpinner
             width={w2}
-            data={_days}
+            data={_days30}
             index={dmy.current?.d-1}
             _height={flat_item._height}
             flat_item={flat_item}
             addPadding={addPadding}
             onSpinnerChange={onDaySpinnerChange}
           />
-        </View>
+        </View>}
+        {!isFullMonth.current && 
+        <View style={{...styles.flatlist_container}}>
+          <OneSpinner
+            width={w2}
+            data={_days29}
+            index={dmy.current?.d-1}
+            _height={flat_item._height}
+            flat_item={flat_item}
+            addPadding={addPadding}
+            onSpinnerChange={onDaySpinnerChange}
+          />
+        </View>}        
       </>
     );
    }
