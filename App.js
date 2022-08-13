@@ -28,7 +28,7 @@ const App = () => {
 
  const [smallDate,setSmallDate] = useState({d:1,m:1,y:5782})
  const [mediumDate,setMediumDate] = useState({d:2,m:1,y:5782})
- const [largeDate,setLargeDate] = useState({d:3,m:1,y:5782})
+ const [largeDate,setLargeDate] = useState()
 
  const onViewableItemsChangedHandler = useCallback(({viewableItems,changed}) => {
   console.log("Visible items are", viewableItems);
@@ -101,18 +101,35 @@ const _renderItem = ({item,index}) => {
     //  </View>
 
 
-    // return <View>
-    //   <HebDateSpinner size='small' addPadding={true} xdmy={smallDate} onSpinnerChange={setSmallDate}/>
-    //   <View style={{height:5}}/>
-    //   <HebDateSpinner size='medium' addPadding={false} xdmy={mediumDate} onSpinnerChange={setMediumDate}/>
-    //   <View style={{height:5}}/>
-    //   <HebDateSpinner size='large' addPadding={true} xdmy={largeDate} onSpinnerChange={setLargeDate}/>
+    // return (
+    //   <View>
+    //     <HebDateSpinner
+    //       size="small"
+    //       addPadding={true}
+    //       xdmy={smallDate}
+    //       onSpinnerChange={setSmallDate}
+    //     />
+    //     <View style={{height: 5}} />
+    //     <HebDateSpinner
+    //       size="medium"
+    //       addPadding={false}
+    //       xdmy={mediumDate}
+    //       onSpinnerChange={setMediumDate}
+    //     />
+    //     <View style={{height: 5}} />
+    //     <HebDateSpinner
+    //       size="large"
+    //       addPadding={true}
+    //       dmy={largeDate}
+    //       year_spinner={{from:4990,to:4999}}
+    //       onSpinnerChange={setLargeDate}
+    //     />
 
-
-    //   <Text style={{fontSize:30}}>{newTDate(smallDate)?.dmyFormat()}</Text>
-    //   <Text style={{fontSize:30}}>{newTDate(mediumDate)?.dmyFormat()}</Text>
-    //   <Text style={{fontSize:30}}>{newTDate(largeDate)?.dmyFormat()}</Text>
-    // </View>
+    //     <Text style={{fontSize: 30}}>{newTDate(smallDate)?.dmyFormat()}</Text>
+    //     <Text style={{fontSize: 30}}>{newTDate(mediumDate)?.dmyFormat()}</Text>
+    //     <Text style={{fontSize: 30}}>{newTDate(largeDate)?.dmyFormat()}</Text>
+    //   </View>
+    // );
 
     // <HebDateSpinner size='medium' addPadding={false} dmy={seeing} onSpinnerChange={onLastSpinnerChange}/>
 

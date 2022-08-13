@@ -20,7 +20,8 @@ Temporal.PlainDate.prototype.dayMonthFormat = function() {
 }
 
 Temporal.PlainDate.prototype.plainDmyFormat = function() {
-  let ret = `${this.day.dateGim()} ${this.hebMonthName()} ${(this.year-5000).dateGim()}`
+  const thousands = parseInt(this.year/1000)*1000
+  let ret = `${this.day.dateGim()} ${this.hebMonthName()} ${(this.year-thousands).dateGim()}`
   return ret.replace(/['"]/g, '')
 }
 
@@ -61,7 +62,7 @@ Temporal.PlainDate.prototype.hebMonthName = function () {
 
 //check if valid temporal date
 Temporal.PlainDate.prototype.isValidDate = function() {
-  return this.year>=5000 && this.year<=5999 && this.month>=1 && this.month<=13 && this.day>=1 && this.day<=31
+  return this.year>=4000 && this.year<=5999 && this.month>=1 && this.month<=13 && this.day>=1 && this.day<=31
 }
 
 
@@ -208,7 +209,7 @@ export const currentDate_dmy = () => {
 export const isValidHebDate = ({d,m,y}) => {
   if ( !d || !m || !y ) 
     return false
-  return (y>=5000 && y<=5999 && m>=1 && m<=13 && d>=1 && d<=30)
+  return (y>=0 && y<=6000 && m>=1 && m<=13 && d>=1 && d<=30)
 }
 
 export const isValidHebDateStr = (dateStr) => {

@@ -5,4 +5,3 @@ npx react-native run-android
 
 ### TODO
 1.save in local storage
-2.date picker

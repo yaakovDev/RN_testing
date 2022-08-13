@@ -1,5 +1,5 @@
-import React,{useCallback,useEffect,useRef,useState} from 'react';
-import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native';
+import React,{useCallback,useMemo,useEffect,useRef,useState} from 'react'
+import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native'
 import gim,{newTDate,currentDate_dmy} from '../logics/hebDates'
 // import '../logics/hebDates'
 
@@ -8,7 +8,6 @@ const _days30 = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב'
 const _days29 = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט'].map( (i,index)=> ({day:index+1,name:i}))
 const _months = ['תשרי','חשון','כסלו','טבת','שבט','אדר','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
 const _months_leap = ['תשרי','חשון','כסלו','טבת','שבט','אדר-א','אדר-ב','ניסן','אייר','סיון','תמוז','אב','אלול'].map( (i,index)=> ({month:index+1,name:i}))
-const _years = [...Array(20).keys()].map( (_,index)=> ({year:5770+index,name:(770+index).gim(),inLeapYear:newTDate({d:1,m:1,y:5770+index}).inLeapYear}))
 
 
 const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChange}) => {
@@ -72,7 +71,7 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 }
 
 
-export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) => {
+export const HebDateSpinner = ({size,addPadding, dmy: _dmy,year_spinner,onSpinnerChange}) => {
 
   const __dmy = (_dmy) ? _dmy : currentDate_dmy()
   // const [dmy,setDmy] = useState(__dmy)
@@ -81,8 +80,22 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy ,onSpinnerChange}) =>
   const isLeap = useRef(newTDate(__dmy).inLeapYear)  
   const isFullMonth = useRef((newTDate({...__dmy,d:30}).day==30))  
 
+  const {from,to} = year_spinner??{from:__dmy.y-10,to:__dmy.y+10}
+  if(from>to) {
+      console.error(`invalid from>to in year_spinner property`);
+      return null
+    }
+
+  const [_years] = useState([...Array(to-from+1).keys()].map( (_,index)=> {
+    const thousands = parseInt((from+index)/1000)*1000
+    return {
+      year:from+index,
+      name:((from-thousands)+index).gim(),
+      inLeapYear:newTDate({d:1,m:1,y:from+index}).inLeapYear
+      }
+    }))
+
   const _setDmy = (_dmy) => { 
-    //console.log(`${newTDate(dmy.current).dmyFormat()}->${newTDate(_dmy).dmyFormat()}`);
     dmy.current = _dmy
     onSpinnerChange?.(_dmy)
    }

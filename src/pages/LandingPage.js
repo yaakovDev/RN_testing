@@ -1,8 +1,9 @@
-import React,{useState,useRef} from 'react';
+import React,{useState,useRef,useEffect} from 'react';
 import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 import { HebDateSpinner} from '../components/HebDateSpinner'
 import {Switch,Modal,StyleSheet,Text,View} from 'react-native';
+import {storeObj,getObj} from '../logics/localStorage'
 
 const Section = ({caption,text,supText,children}) => { 
   return (
@@ -28,17 +29,31 @@ const Section = ({caption,text,supText,children}) => {
 export const LandingPage = () => {
   const [dateModalVisible,setDateModalVisible] = useState(false)
   const [switchVal,toggleSwitch] = useState(false)
-  const [seeing,setSeeing] = useState()
+  const [seeing,setSeeing] = useState(null)
   const [prevSeeing,setPrevSeeing] = useState()
 
+  useEffect(() => {
+    initValues = async () => {
+      setSeeing(await getObj('seeingDate'))
+    }
+    initValues()
+  }, [])
+  
   const showDateModal = (event) => {  
     // console.dir(event.nativeEvent)
     //setYY(event.nativeEvent.locationX)
     setDateModalVisible(true)
   }
-  
+
+  const onSetSeeing = (seeing) => { 
+    setSeeing(seeing)
+    storeObj('seeingDate',seeing)
+   }
 
   const getSeeingDate = () => { 
+    if (!seeing) 
+      return {date:null,dateStr:'loading....'}
+      
     const date = newTDate(seeing)
     //const {isValid,date} = isValidHebDateStr(seeing)
     // const dateStr =  (isValid) ? date.dmyFormat() : 'תאריך לא תקין'
@@ -70,13 +85,13 @@ export const LandingPage = () => {
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה קודם </Text>
         {/* <Button title='Date' color="cyan" onPress={showDateModal}/> */}
         {/* <TextInput style={styles.hebrewInput} ref={seeingRef}  placeholder='א אדר תשפב' onChangeText={onChangePrevSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} xdmy={prevSeeing} onSpinnerChange={setPrevSeeing}/>
+        <HebDateSpinner size='medium' addPadding={false} dmy={prevSeeing} onSpinnerChange={setPrevSeeing}/>
       </View>
      
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
         {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
-        <HebDateSpinner size='medium' addPadding={false} xdmy={seeing} onSpinnerChange={setSeeing}/>
+        {seeing && <HebDateSpinner size='medium' addPadding={false} dmy={seeing} year_spinner={{from:5772,to:5782}} onSpinnerChange={onSetSeeing}/>}
       </View>
     </View>
 
