@@ -22,7 +22,8 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
       listRef.current.scrollToIndex({animated:true,index,viewPosition:addPadding ? 0 : 0})
   },[])
   
-  const onScroll = useCallback((event) => {
+  //triggers only on user gesture, but not on calling 'scrollToIndex'
+  const onMomentumScrollEnd = useCallback((event) => {
     const index = Math.round(event.nativeEvent.contentOffset.y / _height)
     if ( index==prevIndex.current)
       return
@@ -65,7 +66,8 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
        snapToAlignment="start"
        decelerationRate={"normal"}
        snapToInterval={_height}       
-       onScroll={onScroll}
+       //onScroll={onScroll}
+       onMomentumScrollEnd={onMomentumScrollEnd}
        ref={listRef}
      />
 }
@@ -73,9 +75,15 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 
 export const HebDateSpinner = ({size,addPadding, dmy: _dmy,year_spinner,onSpinnerChange}) => {
 
-  const __dmy = (_dmy) ? _dmy : currentDate_dmy()
+  if(!_dmy) {
+    console.error(`HebDateSpinner --> invalid 'dmy' property value`);
+    return null
+    }
+
+  // const __dmy = (_dmy) ? _dmy : currentDate_dmy()
   // const [dmy,setDmy] = useState(__dmy)
   // const [isLeap,setIsLeap] = useState(newTDate(__dmy).inLeapYear)
+  const __dmy = _dmy
   const dmy = useRef(__dmy)
   const isLeap = useRef(newTDate(__dmy).inLeapYear)  
   const isFullMonth = useRef((newTDate({...__dmy,d:30}).day==30))  

@@ -1,9 +1,9 @@
 import React,{useState,useRef,useEffect} from 'react';
-import {newTDate,currentTDate,isValidHebDateStr} from '../logics/hebDates'
+import {newTDate,currentDate_dmy} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
 import { HebDateSpinner} from '../components/HebDateSpinner'
 import {Switch,Modal,StyleSheet,Text,View} from 'react-native';
-import {storeObj,getObj} from '../logics/localStorage'
+import {localStorage} from '../logics/localStorage'
 
 const Section = ({caption,text,supText,children}) => { 
   return (
@@ -29,14 +29,16 @@ const Section = ({caption,text,supText,children}) => {
 export const LandingPage = () => {
   const [dateModalVisible,setDateModalVisible] = useState(false)
   const [switchVal,toggleSwitch] = useState(false)
-  const [seeing,setSeeing] = useState(null)
-  const [prevSeeing,setPrevSeeing] = useState()
+  const [seeing,setSeeing] = useState()
+  const [prevSeeing,setPrevSeeing] = useState(currentDate_dmy())
 
   useEffect(() => {
-    initValues = async () => {
-      setSeeing(await getObj('seeingDate'))
-    }
-    initValues()
+    (async () => {
+      const sd = await localStorage.get('seeingDate')
+      console.log(`${newTDate(sd).dmyFormat()}`);
+      setSeeing(sd)
+    })() //IIFE syntax
+
   }, [])
   
   const showDateModal = (event) => {  
@@ -47,7 +49,7 @@ export const LandingPage = () => {
 
   const onSetSeeing = (seeing) => { 
     setSeeing(seeing)
-    storeObj('seeingDate',seeing)
+    localStorage.store('seeingDate',seeing)
    }
 
   const getSeeingDate = () => { 
@@ -91,7 +93,7 @@ export const LandingPage = () => {
       <View style={{...styles.inputContainer}}>
         <Text style={{fontSize:25,marginLeft:10,borderWidth:0,color:'black'}}>ראיה אחרון</Text>
         {/* <TextInput style={styles.hebrewInput}  placeholder='ג אדר-ב תשפב' onChangeText={onChangeSeeing}/> */}
-        {seeing && <HebDateSpinner size='medium' addPadding={false} dmy={seeing} year_spinner={{from:5772,to:5782}} onSpinnerChange={onSetSeeing}/>}
+        {seeing && <HebDateSpinner size='medium' addPadding={false} dmy={seeing} year_spinner={{from:5772,to:5784}} onSpinnerChange={onSetSeeing}/>}
       </View>
     </View>
 
