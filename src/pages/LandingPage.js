@@ -1,9 +1,10 @@
 import React,{useState,useRef,useEffect} from 'react';
 import {newTDate,currentDate_dmy} from '../logics/hebDates'
 import {hodesh,bienonit,haflaga} from '../logics/vestDates'
-import { HebDateSpinner} from '../components/HebDateSpinner'
+// import { HebDateSpinner} from '../components/HebDateSpinner'
 import {Switch,Modal,StyleSheet,Text,View} from 'react-native';
 import {localStorage} from '../logics/localStorage'
+import {HebDateSpinner} from 'react-native-heb-date-picker'
 
 const Section = ({caption,text,supText,children}) => { 
   return (
