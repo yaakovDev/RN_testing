@@ -1,6 +1,9 @@
 import React,{useState,useCallback,useMemo} from 'react';
 import {LandingPage} from './src/pages/LandingPage'
-import {HebDateSpinner} from './src/components/HebDateSpinner'
+// import {HebDateSpinner} from './src/components/HebDateSpinner'
+import {HebDateSpinner} from 'react-native-heb-date-picker'
+
+
 import {newTDate} from './src/logics/hebDates'
 
 
@@ -106,28 +109,31 @@ const _renderItem = ({item,index}) => {
     //     <HebDateSpinner
     //       size="small"
     //       addPadding={true}
-    //       xdmy={smallDate}
+    //       dmy={{d:1,m:1,y:5771}}
     //       onSpinnerChange={setSmallDate}
     //     />
-    //     <View style={{height: 5}} />
+
+    //     <View style={{height: 25}} />
     //     <HebDateSpinner
     //       size="medium"
     //       addPadding={false}
-    //       xdmy={mediumDate}
+    //       year_spinner={{from:5772,to:5784}}
+    //       dmy={{d:2,m:2,y:5772}}
     //       onSpinnerChange={setMediumDate}
     //     />
-    //     <View style={{height: 5}} />
+
+    //     <View style={{height: 25}} />
     //     <HebDateSpinner
     //       size="large"
     //       addPadding={true}
-    //       dmy={largeDate}
-    //       year_spinner={{from:4990,to:4999}}
+    //       dmy={{d:3,m:3,y:5773}}
+    //       year_spinner={{from:5770,to:5784}}
     //       onSpinnerChange={setLargeDate}
     //     />
 
-    //     <Text style={{fontSize: 30}}>{newTDate(smallDate)?.dmyFormat()}</Text>
+    //     {/* <Text style={{fontSize: 30}}>{newTDate(smallDate)?.dmyFormat()}</Text>
     //     <Text style={{fontSize: 30}}>{newTDate(mediumDate)?.dmyFormat()}</Text>
-    //     <Text style={{fontSize: 30}}>{newTDate(largeDate)?.dmyFormat()}</Text>
+    //     <Text style={{fontSize: 30}}>{newTDate(largeDate)?.dmyFormat()}</Text> */}
     //   </View>
     // );
 

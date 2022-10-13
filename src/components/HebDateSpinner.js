@@ -1,7 +1,7 @@
-import React,{useCallback,useMemo,useEffect,useRef,useState} from 'react'
+import React,{useCallback,useEffect,useRef,useState} from 'react'
 import {Text,View,FlatList,StyleSheet,scrollToIndex} from 'react-native'
-import gim,{newTDate,currentDate_dmy} from '../logics/hebDates'
-// import '../logics/hebDates'
+// import gim,{newTDate} from '../logics/hebDates'
+const  {gim,newTDate} = require('../logics/hebDates')
 
 
 const _days30 = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב','יג','יד','טו','טז','יז','יח','יט','כ','כא','כב','כג','כד','כה','כו','כז','כח','כט','ל'].map( (i,index)=> ({day:index+1,name:i}))
@@ -76,21 +76,17 @@ const OneSpinner = ({data,width,index,_height,flat_item,addPadding,onSpinnerChan
 export const HebDateSpinner = ({size,addPadding, dmy: _dmy,year_spinner,onSpinnerChange}) => {
 
   if(!_dmy) {
-    console.error(`HebDateSpinner --> invalid 'dmy' property value`);
+    console.error(`'dmy' property is missing`);
     return null
     }
 
-  // const __dmy = (_dmy) ? _dmy : currentDate_dmy()
-  // const [dmy,setDmy] = useState(__dmy)
-  // const [isLeap,setIsLeap] = useState(newTDate(__dmy).inLeapYear)
-  const __dmy = _dmy
-  const dmy = useRef(__dmy)
-  const isLeap = useRef(newTDate(__dmy).inLeapYear)  
-  const isFullMonth = useRef((newTDate({...__dmy,d:30}).day==30))  
+  const dmy = useRef(_dmy)
+  const isLeap = useRef(newTDate(_dmy).inLeapYear)  
+  const isFullMonth = useRef((newTDate({..._dmy,d:30}).day==30))  
 
-  const {from,to} = year_spinner??{from:__dmy.y-10,to:__dmy.y+10}
+  const {from,to} = year_spinner??{from:_dmy.y-10,to:_dmy.y+10}
   if(from>to) {
-      console.error(`invalid from>to in year_spinner property`);
+      console.error(`invalid 'year_spinner' property value`);
       return null
     }
 
@@ -131,7 +127,6 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy,year_spinner,onSpinne
       _m++
     
     isLeap.current = item.inLeapYear
-    // setIsLeap(item.inLeapYear)
     _setDmy({...dmy.current,m:_m,y:item.year})
   }  
 
@@ -227,7 +222,6 @@ export const HebDateSpinner = ({size,addPadding, dmy: _dmy,year_spinner,onSpinne
 
 const styles = StyleSheet.create({
   col_container: {
-    // flex: 1,
     flexDirection: 'column',
   },
   row_container: {

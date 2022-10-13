@@ -1,0 +1,13 @@
+1.
+cd ..\project\
+npx react-native  bundle  --platform  android  --dev  false  --entry-file  index.js  --bundle-output  android/app/src/main/assets/index.android.bundle  --assets-dest  android/app/src/main/res/
+
+2.
+cd ..\project\android\
+gradlew clean
+gradlew assembleRelease
+gradlew assembleRelease --stacktrace
+
+
+
+"C:\Program Files\Java\jdk-17.0.3.1\bin\keytool" -genkeypair -v -storetype PKCS12 -keystore key123.keystore -alias key123 -keyalg RSA -keysize 2048 -validity 10000
